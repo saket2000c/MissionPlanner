@@ -111,7 +111,7 @@ namespace SkiaTest
             private static GRContext grContext;
 
             public static unsafe void ProcessPaint(ref PaintPacket packet, NativePixelBuffer pixelBuffer,
-                Action<SKSurface> handler)
+                Action<SKCanvas> handler)
             {
 
                 var hwnd = packet.Hwnd;
@@ -124,6 +124,16 @@ namespace SkiaTest
                 var skPainted = false;
                 try
                 {
+                    var pic = new SKPictureRecorder();
+                    pic.BeginRecording(SKRect.Empty);
+                    handler(pic.RecordingCanvas);
+                    /*var ms = new MemoryStream();
+                    var svg = SKSvgCanvas.Create(SKRect.Empty, ms);
+                    handler(svg);
+                    svg.Flush();
+                    ms.Position = 0;
+                    File.WriteAllBytes("Screen.svg", ms.ToArray());
+                    */
                     using (var surface = SKSurface.Create(
                         size.Width,
                         size.Height,
@@ -134,7 +144,12 @@ namespace SkiaTest
                     {
                         if (surface != null)
                         {
-                            handler(surface);
+                            var draw = pic.EndRecordingAsDrawable();
+                            draw.Draw(surface.Canvas, 0, 0);
+
+                            //File.WriteAllBytes("screen.skp", draw.Snapshot().Serialize().Span.ToArray());
+
+                            //handler(surface.Canvas);
                             /*
                             foreach (var VARIABLE in Enumerable.Range(0, pixelBuffer.Stride * size.Height / 4))
                             {
@@ -157,7 +172,7 @@ namespace SkiaTest
                             unchecked
                             {
                                 var a = 0;
-                                while (a < max)
+                                //while (a < max)
                                 {/*
                                     *arr = ((*arr & (int) 0xff000000) >> 0) +
                                            ((*arr & 0xff0000) >> 16) +
@@ -208,7 +223,7 @@ namespace SkiaTest
             {
                 base.OnClose(ref packet);
 
-                Application.Exit();
+                MainV2.instance.BeginInvoke(new Action(() => { Application.Exit(); }));
             }
 
             private void Application_Idle(object sender, EventArgs e)
@@ -230,7 +245,7 @@ namespace SkiaTest
                 TypeDescriptor.AddAttributes(type, newAttributes);
             }
 
-            protected virtual void OnSkiaPaint(SKSurface surface) { }
+            protected virtual void OnSkiaPaint(SKCanvas canvas) { }
 
             protected override void OnPaint(ref PaintPacket packet)
             {
@@ -253,7 +268,7 @@ namespace SkiaTest
                         var wparam = msg.WParam;
                         var lparam = msg.LParam;
 
-                        if (msgid == Msg.WM_MOUSEMOVE || msgid == Msg.WM_LBUTTONDOWN || msgid == Msg.WM_LBUTTONUP || msgid == Msg.WM_MOUSEMOVE)
+                        if (msgid == Msg.WM_MOUSEMOVE || msgid == Msg.WM_LBUTTONDOWN || msgid == Msg.WM_LBUTTONUP || msgid == Msg.WM_MOUSEMOVE || msgid == Msg.WM_QUIT)
                             XplatUI.driver.SendMessage(hnd, msgid, wparam, lparam);                      
                     }
                 }
@@ -273,12 +288,12 @@ namespace SkiaTest
         
         public sealed class SkiaWindow : SkiaWindowBase
         {
-            protected override void OnSkiaPaint(SKSurface e)
+            protected override void OnSkiaPaint(SKCanvas e)
             {
                 try
                 {
                     
-                var canvas = e.Canvas;
+                var canvas = e;
 
                 canvas.Clear(SKColors.Gray);
 
@@ -372,10 +387,11 @@ namespace SkiaTest
             {
                 // setup clip
                 var parent = hwnd;
+                // resets the clip
                 Canvas.ClipRect(
                     SKRect.Create(0, 0, Screen.PrimaryScreen.Bounds.Width*2,
                         Screen.PrimaryScreen.Bounds.Height*2), (SKClipOperation) 5);
-
+                    
                 while (parent != null)
                 {
                     var xp = 0;
@@ -400,7 +416,6 @@ namespace SkiaTest
                     if (frm != null)
                     {
                         borders = Hwnd.GetBorders(frm.GetCreateParams(), null);
-
                         Canvas.ClipRect(
                             SKRect.Create(0, 0, Screen.PrimaryScreen.Bounds.Width*2,
                                 Screen.PrimaryScreen.Bounds.Height*2), (SKClipOperation) 5);
@@ -410,9 +425,9 @@ namespace SkiaTest
                         Canvas.DeviceClipBounds.Height > 0)
                     {
                         if (hwnd.DrawNeeded || forcerender)
-                        {
+                            {
                                 if (hwnd.hwndbmpNC != null)
-                                    Canvas.DrawImage(hwnd.hwndbmpNC,
+                                    Canvas.DrawBitmap(hwnd.hwndbmpNC,
                                         new SKPoint(x - borders.left, y - borders.top), new SKPaint()
                                         {
                                             ColorFilter =
@@ -428,11 +443,11 @@ namespace SkiaTest
                             Canvas.ClipRect(
                                 SKRect.Create(x, y, hwnd.width - borders.right - borders.left,
                                     hwnd.height - borders.top - borders.bottom), SKClipOperation.Intersect);
-
-                            Canvas.DrawDrawable(hwnd.hwndbmp,
+                           
+                            Canvas.DrawBitmap(hwnd.hwndbmp,
                                 new SKPoint(x, y));
-
-                            wasdrawn = true;
+                            
+                                wasdrawn = true;
                         }
 
                         hwnd.DrawNeeded = false;
@@ -450,9 +465,15 @@ namespace SkiaTest
                     {
                         if (hwnd.DrawNeeded || forcerender)
                         {
-                            Canvas.DrawDrawable(hwnd.hwndbmp,
-                                new SKPoint(x + 0, y + 0));
+                                var ctl = Control.FromHandle(hwnd.ClientWindow);
+                                //var pic = hwnd.hwndbmp.Snapshot();
+                                //var bmp = SKBitmap.FromImage(SKImage.FromPicture(pic, new SKSizeI(hwnd.width, hwnd.height)));
+                                //Canvas.DrawBitmap(bmp, new SKPoint(x + 0, y + 0));
 
+                                // clip fails
+                                Canvas.DrawBitmap(hwnd.hwndbmp,
+                                    new SKPoint(x + 0, y + 0));
+                                
                             wasdrawn = true;
                         }
 

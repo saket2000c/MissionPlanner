@@ -163,6 +163,12 @@ GRBackendRenderTargetDesc backendRenderTargetDescription = new GRBackendRenderTa
             }
         }
 
+        public static Graphics FromSKBitmap(SKBitmap bmpDestination)
+        {
+            var pixels = bmpDestination.PeekPixels();
+            return new Graphics(SKSurface.Create(pixels));
+        }
+
         public static implicit operator Image(Graphics sk)
         {
             using (var snap = sk._surface.Snapshot())
