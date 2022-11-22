@@ -129,6 +129,9 @@
   <data name="CHK_map.Text" xml:space="preserve">
     <value>Xəritəni göstər</value>
   </data>
+	<data name="CHK_OA.Text" xml:space="preserve">
+    <value>عرض الخريطة</value>
+  </data>
   <data name="chk_time.Text" xml:space="preserve">
     <value>Vaxtı İstifadə et</value>
   </data>

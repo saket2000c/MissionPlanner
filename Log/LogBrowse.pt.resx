@@ -126,6 +126,9 @@
   <data name="CHK_map.Text" xml:space="preserve">
     <value>Mostrar Map</value>
   </data>
+	<data name="chk_oa.Text" xml:space="preserve">
+    <value>Tempo uso</value>
+  </data>
   <data name="chk_time.Text" xml:space="preserve">
     <value>Tempo uso</value>
   </data>

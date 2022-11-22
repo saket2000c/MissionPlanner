@@ -56,6 +56,7 @@ namespace MissionPlanner.Log
             this.chk_mode = new System.Windows.Forms.CheckBox();
             this.BUT_Graphit_R = new MissionPlanner.Controls.MyButton();
             this.chk_time = new System.Windows.Forms.CheckBox();
+            this.chk_oa = new System.Windows.Forms.CheckBox();
             this.CHK_map = new System.Windows.Forms.CheckBox();
             this.CMB_preselect = new System.Windows.Forms.ComboBox();
             this.BUT_removeitem = new MissionPlanner.Controls.MyButton();
@@ -227,6 +228,7 @@ namespace MissionPlanner.Log
             this.myGMAP1.ShowTileGridLines = false;
             this.myGMAP1.Zoom = 0D;
             this.myGMAP1.OnRouteClick += new GMap.NET.WindowsForms.RouteClick(this.myGMAP1_OnRouteClick);
+            this.myGMAP1.Load += new System.EventHandler(this.myGMAP1_Load);
             this.myGMAP1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.myGMAP1_MouseDown);
             this.myGMAP1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.myGMAP1_MouseMove);
             this.myGMAP1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.myGMAP1_MouseUp);
@@ -250,6 +252,7 @@ namespace MissionPlanner.Log
             this.splitContainerButGrid.Panel1.Controls.Add(this.chk_mode);
             this.splitContainerButGrid.Panel1.Controls.Add(this.BUT_Graphit_R);
             this.splitContainerButGrid.Panel1.Controls.Add(this.chk_time);
+            this.splitContainerButGrid.Panel1.Controls.Add(this.chk_oa);
             this.splitContainerButGrid.Panel1.Controls.Add(this.CHK_map);
             this.splitContainerButGrid.Panel1.Controls.Add(this.CMB_preselect);
             this.splitContainerButGrid.Panel1.Controls.Add(this.BUT_removeitem);
@@ -323,6 +326,16 @@ namespace MissionPlanner.Log
             this.chk_time.Name = "chk_time";
             this.chk_time.UseVisualStyleBackColor = true;
             this.chk_time.CheckedChanged += new System.EventHandler(this.chk_time_CheckedChanged);
+            // 
+            // chk_oa
+            // 
+            resources.ApplyResources(this.chk_time, "chk_oa");
+            this.chk_time.Checked = true;
+            this.chk_time.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chk_time.Name = "chk_oa";
+            this.chk_time.UseVisualStyleBackColor = true;
+            this.chk_time.CheckedChanged += new System.EventHandler(this.chk_oa_CheckedChanged);
+
             // 
             // CHK_map
             // 

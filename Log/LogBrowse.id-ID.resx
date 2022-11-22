@@ -129,6 +129,9 @@
   <data name="CHK_map.Text" xml:space="preserve">
     <value>Tampilkan Peta</value>
   </data>
+	<data name="chk_oa.Text" xml:space="preserve">
+    <value>Gunakan Waktu</value>
+  </data>
   <data name="chk_time.Text" xml:space="preserve">
     <value>Gunakan Waktu</value>
   </data>

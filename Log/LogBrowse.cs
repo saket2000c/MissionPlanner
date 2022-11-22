@@ -3382,6 +3382,11 @@ main()
             }
         }
 
+        private void chk_oa_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
         private void chk_time_CheckedChanged(object sender, EventArgs e)
         {
             ModeCache.Clear();
@@ -3735,6 +3740,11 @@ main()
                     filehandles.ForEach(a => a.Value.Close());
                 }
             }
+        }
+
+        private void myGMAP1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
