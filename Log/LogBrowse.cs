@@ -2055,7 +2055,7 @@ main()
                     var mapoverlay = new GMapOverlay("overlay");
                     if (gpscache.Length == 0)
                         gpscache = logdata.GetEnumeratorType(new string[]
-                                {"GPS", "POS", "GPS2", "GPSB", "CMD", "CAM", "TRIG", "SIM", "RALY"})
+                                {"GPS", "POS", "GPS2", "GPSB", "CMD", "CAM", "TRIG", "SIM", "RALY","DBAA"})
                             .ToArray();
 
                     DateTime starttime = DateTime.MinValue;
@@ -2077,6 +2077,10 @@ main()
 
                     List<PointLatLng> routelistcmd = new List<PointLatLng>();
                     List<int> samplelistcmd = new List<int>();
+
+                    List<PointLatLng> routelistDBAA = new List<PointLatLng>();
+                    List<int> samplelistDBAA = new List<int>();
+
 
                     int i = 0;
                     int firstpoint = 0;
@@ -2125,8 +2129,7 @@ main()
                                     routelist.Add(ans);
                                 }
                             }
-                        }
-                        else if (item.msgtype == "GPS2" || item.msgtype == "GPS" && item.instance == "1")
+                        }else if (item.msgtype == "GPS2" || item.msgtype == "GPS" && item.instance == "1")
                         {
                             var ans = getPointLatLng(item);
 
@@ -2290,7 +2293,71 @@ main()
                                 }
                             }
                         }
-                        else if (item.msgtype == "CAM")
+                        else if (item.msgtype == "DBAA")
+                        {
+                            var ans = getPointLatLng(item);
+                            if (ans != null && ans.Lat !=0 && ans.Lng != 0)
+                            {
+                                //bool duplicate = false;
+                                //foreach (GMapMarkerWP m in mapoverlay.Markers)
+                                //{
+                                   // if (m.Tag?.ToString() == item["CNum"].ToString())
+                                    //{
+                                      //  duplicate = true;
+                                    //    break;
+                                  //  }
+                                //}
+
+                                //if (!duplicate)
+                                //{
+                                    routelistDBAA.Add(ans);
+                                    samplelistDBAA.Add(i);
+
+                                    GMapMarker newWP = new GMapMarkerWP(ans, "0");
+                                    newWP.Tag = 0.ToString();
+
+                                    //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                    mapoverlay.Markers.Add(newWP);
+
+                                    //FMT, 146, 45, CMD, QHHHfffffff, TimeUS,CTot,CNum,CId,Prm1,Prm2,Prm3,Prm4,Lat,Lng,Alt
+                                    //CMD, 43368479, 19, 18, 85, 0, 0, 0, 0, -27.27409, 151.2901, 0
+
+                                    //if (item["CTot"] != null && item["CNum"] != null &&
+                                      //  (int.Parse(item["CTot"]) - 1) == int.Parse(item["CNum"]))
+                                    //{
+                                        //split the route in several small parts (due to memory errors)
+                                        GMapRoute route_part = new GMapRoute(routelistcmd, "routecmd_" + rtcnt);
+                                        route_part.Stroke = new Pen(Color.FromArgb(127, Color.GreenYellow), 2);
+
+                                        LogRouteInfo lri = new LogRouteInfo();
+                                        lri.firstpoint = firstpointpos;
+                                        lri.lastpoint = i;
+                                        lri.samples.AddRange(samplelistcmd);
+
+                                        route_part.Tag = lri;
+                                        route_part.IsHitTestVisible = false;
+                                        mapoverlay.Routes.Add(route_part);
+
+                                        rtcnt++;
+
+                                        //clear the list and set the last point as first point for the next route
+                                        routelistcmd.Clear();
+                                        samplelistcmd.Clear();
+                                        firstpointcmd = i;
+                                        samplelistcmd.Add(firstpointcmd);
+                                        routelistcmd.Add(ans);
+                                   // }
+                                //}
+                                //else
+                                //{
+                                  //  mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                //}
+
+                            }
+                         
+                                
+
+                        }else if (item.msgtype == "CAM")
                         {
                             var ans = getPointLatLng(item);
 
@@ -2597,6 +2664,40 @@ main()
                 catch
                 {
                 }
+            }else if (item.msgtype == "DBAA")
+            {
+                if(!dflog.logformat.ContainsKey("DBAA"))
+                    return null;
+
+                int index = dflog.FindMessageOffset("DBAA", "Lat");
+                if (index == -1)
+                {
+                    return null;
+                }
+
+                int index2 = dflog.FindMessageOffset("DBAA", "Lng");
+                if (index2 == -1)
+                {
+                    return null;
+                }
+                try
+                {
+                    string lat = item.items[index].ToString();
+                    string lng = item.items[index2].ToString();
+
+                    PointLatLngAlt pnt = new PointLatLngAlt() { };
+                    pnt.Lat = double.Parse(lat, System.Globalization.CultureInfo.InvariantCulture);
+                    pnt.Lng = double.Parse(lng, System.Globalization.CultureInfo.InvariantCulture);
+                    pnt.Tag = item.lineno.ToString();
+                    if (Math.Abs(pnt.Lat) > 90 || Math.Abs(pnt.Lng) > 180)
+                        return null;
+
+                    return pnt;
+                }
+                catch
+                {
+                }
+
             }
             else
             {
