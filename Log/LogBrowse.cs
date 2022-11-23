@@ -2296,6 +2296,7 @@ main()
                         else if (item.msgtype == "DBAA")
                         {
                             var ans = getPointLatLng(item);
+                            int ans1 = getPointVerified(item);
                             if (ans != null && ans.Lat !=0 && ans.Lng != 0)
                             {
                                 //bool duplicate = false;
@@ -2312,52 +2313,69 @@ main()
                                 //{
                                     routelistDBAA.Add(ans);
                                     samplelistDBAA.Add(i);
+                                
+                                if (ans1 == 1)
+                                {
+                                    GMapMarker newWP = new GMapMarkerWP(ans);
+                                    newWP.Tag = "OA";
 
-                                    GMapMarker newWP = new GMapMarkerWP(ans, "0");
-                                    newWP.Tag = 0.ToString();
+                                    //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                    mapoverlay.Markers.Add(newWP);
+                                }
+                                else
+                                {
+                                    GMapMarker newWP = new GMapMarkerWP(ans, 1);
+                                    newWP.Tag = "OA";
 
                                     //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
                                     mapoverlay.Markers.Add(newWP);
 
-                                    //FMT, 146, 45, CMD, QHHHfffffff, TimeUS,CTot,CNum,CId,Prm1,Prm2,Prm3,Prm4,Lat,Lng,Alt
-                                    //CMD, 43368479, 19, 18, 85, 0, 0, 0, 0, -27.27409, 151.2901, 0
+                                }
 
-                                    //if (item["CTot"] != null && item["CNum"] != null &&
-                                      //  (int.Parse(item["CTot"]) - 1) == int.Parse(item["CNum"]))
-                                    //{
-                                        //split the route in several small parts (due to memory errors)
-                                        GMapRoute route_part = new GMapRoute(routelistcmd, "routecmd_" + rtcnt);
-                                        route_part.Stroke = new Pen(Color.FromArgb(127, Color.GreenYellow), 2);
+                                //FMT, 146, 45, CMD, QHHHfffffff, TimeUS,CTot,CNum,CId,Prm1,Prm2,Prm3,Prm4,Lat,Lng,Alt
+                                //CMD, 43368479, 19, 18, 85, 0, 0, 0, 0, -27.27409, 151.2901, 0
 
-                                        LogRouteInfo lri = new LogRouteInfo();
-                                        lri.firstpoint = firstpointpos;
-                                        lri.lastpoint = i;
-                                        lri.samples.AddRange(samplelistcmd);
+                                //if (item["CTot"] != null && item["CNum"] != null &&
+                                //  (int.Parse(item["CTot"]) - 1) == int.Parse(item["CNum"]))
+                                //{
+                                //split the route in several small parts (due to memory errors)
 
-                                        route_part.Tag = lri;
-                                        route_part.IsHitTestVisible = false;
-                                        mapoverlay.Routes.Add(route_part);
+                                /* GMapRoute route_part = new GMapRoute(routelistcmd, "routecmd_" + rtcnt);
+                                 route_part.Stroke = new Pen(Color.FromArgb(127, Color.Blue), 2);
+                                 LogRouteInfo lri = new LogRouteInfo();
+                                 lri.firstpoint = firstpointpos;
+                                 lri.lastpoint = i;
+                                 lri.samples.AddRange(samplelistcmd);
 
-                                        rtcnt++;
+                                 route_part.Tag = lri;
+                                 route_part.IsHitTestVisible = false;
+                                 mapoverlay.Routes.Add(route_part);
 
-                                        //clear the list and set the last point as first point for the next route
-                                        routelistcmd.Clear();
-                                        samplelistcmd.Clear();
-                                        firstpointcmd = i;
-                                        samplelistcmd.Add(firstpointcmd);
-                                        routelistcmd.Add(ans);
-                                   // }
+                                 rtcnt++;
+
+                                 //clear the list and set the last point as first point for the next route
+                                 routelistcmd.Clear();
+                                 samplelistcmd.Clear();
+                                 firstpointcmd = i;
+                                 samplelistcmd.Add(firstpointcmd);
+                                 routelistcmd.Add(ans);
+                                */
+
+
+
+                                // }
                                 //}
                                 //else
                                 //{
-                                  //  mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                //  mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
                                 //}
 
                             }
-                         
-                                
 
-                        }else if (item.msgtype == "CAM")
+
+
+                        }
+                        else if (item.msgtype == "CAM")
                         {
                             var ans = getPointLatLng(item);
 
@@ -2458,6 +2476,40 @@ main()
 
                 log.Info("End DrawMap");
             }).ConfigureAwait(false);
+        }
+
+        int getPointVerified(DFLog.DFItem item)
+        {
+            if (item.msgtype == "DBAA")
+            {
+                if (!dflog.logformat.ContainsKey("DBAA"))
+                {
+
+                    //System.Diagnostics.Debug.WriteLine("priiiiiiit  2 ");
+                    //Console.WriteLine("priiiiiiit");
+                    return 2;
+                }
+                int index = dflog.FindMessageOffset("DBAA", "Ver");
+
+                if (index > 0)
+                {
+                    try
+                    {
+
+                        String verify = item.items[index].ToString();
+                        //System.Diagnostics.Debug.WriteLine("pointing  = {0}", int.Parse(verify));
+                        return int.Parse(verify);
+                    }
+                    catch
+                    {
+                    }
+                    //System.Diagnostics.Debug.WriteLine("not goooood = {0}", index);
+                    return 1;
+                }
+            }
+            //System.Diagnostics.Debug.WriteLine("printing    ddsfd = 0");
+            return 0;
+
         }
 
         PointLatLngAlt getPointLatLng(DFLog.DFItem item)

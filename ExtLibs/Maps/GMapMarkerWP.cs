@@ -38,6 +38,49 @@ namespace MissionPlanner.Maps
                 fontBitmaps[wpno] = temp;
             }
         }
+        public GMapMarkerWP(PointLatLng p)
+            : base(p, GMarkerGoogleType.blue)
+        {
+            
+            if (font == null)
+                font = SystemFonts.DefaultFont;
+
+            if (!fontBitmaps.ContainsKey("o"))
+            {
+                Bitmap temp = new Bitmap(100, 40, PixelFormat.Format32bppArgb);
+                using (Graphics g = Graphics.FromImage(temp))
+                {
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    txtsize = g.MeasureString("o", font);
+
+                    g.DrawString("o", font, Brushes.Black, new PointF(0, 0));
+                }
+                fontBitmaps[wpno] = temp;
+            }
+        }
+
+        public GMapMarkerWP(PointLatLng p, int val)
+            : base(p, GMarkerGoogleType.red)
+        {
+
+            if (font == null)
+                font = SystemFonts.DefaultFont;
+
+            if (!fontBitmaps.ContainsKey("o"))
+            {
+                Bitmap temp = new Bitmap(100, 40, PixelFormat.Format32bppArgb);
+                using (Graphics g = Graphics.FromImage(temp))
+                {
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                    txtsize = g.MeasureString("o", font);
+
+                    g.DrawString("o", font, Brushes.Black, new PointF(0, 0));
+                }
+                fontBitmaps[wpno] = temp;
+            }
+        }
 
         public override void OnRender(IGraphics g)
         {
