@@ -38,45 +38,44 @@ namespace MissionPlanner.Maps
                 fontBitmaps[wpno] = temp;
             }
         }
-        public GMapMarkerWP(PointLatLng p)
+        public GMapMarkerWP(PointLatLng p, int cluster_num)
             : base(p, GMarkerGoogleType.blue)
         {
-            
             if (font == null)
                 font = SystemFonts.DefaultFont;
 
-            if (!fontBitmaps.ContainsKey("o"))
+            if (!fontBitmaps.ContainsKey(cluster_num.ToString()))
             {
                 Bitmap temp = new Bitmap(100, 40, PixelFormat.Format32bppArgb);
                 using (Graphics g = Graphics.FromImage(temp))
                 {
                     g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                    txtsize = g.MeasureString("o", font);
+                    txtsize = g.MeasureString(cluster_num.ToString(), font);
 
-                    g.DrawString("o", font, Brushes.Black, new PointF(0, 0));
+                    g.DrawString(cluster_num.ToString(), font, Brushes.Black, new PointF(0, 0));
                 }
                 fontBitmaps[wpno] = temp;
             }
         }
 
-        public GMapMarkerWP(PointLatLng p, int val)
+        public GMapMarkerWP(PointLatLng p, int val, int cluster_num)
             : base(p, GMarkerGoogleType.red)
         {
 
             if (font == null)
                 font = SystemFonts.DefaultFont;
 
-            if (!fontBitmaps.ContainsKey("o"))
+            if (!fontBitmaps.ContainsKey(cluster_num.ToString()))
             {
                 Bitmap temp = new Bitmap(100, 40, PixelFormat.Format32bppArgb);
                 using (Graphics g = Graphics.FromImage(temp))
                 {
                     g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                     g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-                    txtsize = g.MeasureString("o", font);
+                    txtsize = g.MeasureString(cluster_num.ToString(), font);
 
-                    g.DrawString("o", font, Brushes.Black, new PointF(0, 0));
+                    g.DrawString(cluster_num.ToString(), font, Brushes.Black, new PointF(0, 0));
                 }
                 fontBitmaps[wpno] = temp;
             }

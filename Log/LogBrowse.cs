@@ -2297,6 +2297,7 @@ main()
                         {
                             var ans = getPointLatLng(item);
                             int ans1 = getPointVerified(item);
+                            int cluster_num = getPointClusterNum(item);
                             if (ans != null && ans.Lat !=0 && ans.Lng != 0)
                             {
                                 //bool duplicate = false;
@@ -2313,23 +2314,28 @@ main()
                                 //{
                                     routelistDBAA.Add(ans);
                                     samplelistDBAA.Add(i);
-                                
-                                if (ans1 == 1)
+
+                                if (cluster_num != 10000)
                                 {
-                                    GMapMarker newWP = new GMapMarkerWP(ans);
-                                    newWP.Tag = "OA";
 
-                                    //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
-                                    mapoverlay.Markers.Add(newWP);
-                                }
-                                else
-                                {
-                                    GMapMarker newWP = new GMapMarkerWP(ans, 1);
-                                    newWP.Tag = "OA";
 
-                                    //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
-                                    mapoverlay.Markers.Add(newWP);
+                                    if (ans1 == 1)
+                                    {
+                                        GMapMarker newWP = new GMapMarkerWP(ans, cluster_num);
+                                        newWP.Tag = "OA";
 
+                                        //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                        mapoverlay.Markers.Add(newWP);
+                                    }
+                                    else
+                                    {
+                                        GMapMarker newWP = new GMapMarkerWP(ans, 1, cluster_num);
+                                        newWP.Tag = "OA";
+
+                                        //mapoverlay.Markers.Add(new GMapMarkerWP(ans, item["CNum"]));
+                                        mapoverlay.Markers.Add(newWP);
+
+                                    }
                                 }
 
                                 //FMT, 146, 45, CMD, QHHHfffffff, TimeUS,CTot,CNum,CId,Prm1,Prm2,Prm3,Prm4,Lat,Lng,Alt
@@ -2478,6 +2484,35 @@ main()
             }).ConfigureAwait(false);
         }
 
+        int getPointClusterNum(DFLog.DFItem item)
+        {
+            if (!dflog.logformat.ContainsKey("DBAA"))
+            {
+
+                //System.Diagnostics.Debug.WriteLine("priiiiiiit  2 ");
+                //Console.WriteLine("priiiiiiit");
+                return 10000;
+            }
+            int index = dflog.FindMessageOffset("DBAA", "CNum");
+
+            if (index > 0)
+            {
+                try
+                {
+
+                    String verify = item.items[index].ToString();
+                    //System.Diagnostics.Debug.WriteLine("pointing  = {0}", int.Parse(verify));
+                    return int.Parse(verify);
+                }
+                catch
+                {
+                }
+                //System.Diagnostics.Debug.WriteLine("not goooood = {0}", index);
+                return 10000;
+            }
+            //System.Diagnostics.Debug.WriteLine("printing    ddsfd = 0");
+            return 10000;
+        }
         int getPointVerified(DFLog.DFItem item)
         {
             if (item.msgtype == "DBAA")
